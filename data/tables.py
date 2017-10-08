@@ -53,6 +53,10 @@ class Event(Base):
     owner_id = Column(Integer, ForeignKey("User.id"))
     owner = relationship("User")
 
+    def find_gps(self):
+        # Send the address to a library that then sets the GPS from it.
+        pass
+
 
 class User(Base):
     __tablename__ = 'User'

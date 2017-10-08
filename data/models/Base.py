@@ -1,3 +1,6 @@
+import datetime
+
+import arrow
 from sqlalchemy import *
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -14,6 +17,11 @@ class Base(BaseModel):
     def json(self):
         obj = self.__dict__.copy()
         obj.pop("_sa_instance_state")
+
+        print(obj)
+        for key, value in obj.items():
+            if type(value) == datetime.datetime:
+                obj[key] = arrow.get(value).humanize()
 
         this_table = self.__class__
 
