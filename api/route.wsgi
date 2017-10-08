@@ -20,12 +20,15 @@ app = application = falcon.API(
 )
 
 user_controller = UserController()
-token_controller = Token()
 event_controller = EventController()
+token_controller = Token()
 
 app.add_route('/user', user_controller)
-app.add_route('/token', token_controller)
+
 app.add_route('/event', event_controller)
+app.add_route('/event/{event_id}', event_controller);
+
+app.add_route('/token', token_controller)
 
 if __name__ == '__main__':
     httpd = simple_server.make_server('localhost', 4000, app)
