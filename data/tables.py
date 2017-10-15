@@ -1,4 +1,6 @@
 from data.models.Base import *
+from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
+from sqlalchemy.sql.functions import func
 
 activity_tag = Table('ActivityTag', Base.metadata,
                      Column("activity_id", Integer, ForeignKey("Activity.id")),
@@ -18,6 +20,12 @@ class Activity(Base):
 
     host_id = Column(Integer, ForeignKey("Host.id"))
     host = relationship("Host")
+
+    room_id = Column(Integer, ForeignKey("Room.id"))
+    room = relationship("Room")
+
+    event_id = Column(Integer, ForeignKey("Event.id"))
+    event = relationship("Event")
 
     tags = relationship("Tag",
                         secondary=activity_tag,
@@ -41,21 +49,24 @@ class Event(Base):
     start = Column(DateTime)
     end = Column(DateTime)
 
-    address_1 = Column(String)
-    address_2 = Column(String)
-    city = Column(String)
-    state = Column(String)
-    postcode = Column(String)
-    country = Column(String)
-
     gps = Column(String)
+
+    location_id = Column(Integer, ForeignKey("Location.id"))
+    location = relationship("Location")
 
     owner_id = Column(Integer, ForeignKey("User.id"))
     owner = relationship("User")
 
-    def find_gps(self):
-        # Send the address to a library that then sets the GPS from it.
-        pass
+    is_published = Column(Boolean)
+
+    @hybrid_property
+    def is_past(self):
+        return self.end.date() < datetime.datetime.now().date()
+
+    @is_past.expression
+    def is_past(self):
+        return self.end < func.current_date()
+
 
 
 class User(Base):
@@ -71,10 +82,20 @@ class Location(Base):
     __tablename__ = 'Location'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
-    address = Column(String, nullable=False)
     gps = Column(String)
 
+    address_1 = Column(String)
+    address_2 = Column(String)
+    city = Column(String)
+    state = Column(String)
+    postcode = Column(String)
+    country = Column(String)
+
     floors = relationship("Floor", back_populates="location")
+
+    def find_gps(self):
+        # Send the address to a library that then sets the GPS from it.
+        pass
 
 
 class Floor(Base):

@@ -82,7 +82,6 @@ class Token(object):
     def getUserId(token):
         return Token.extractTokenData(token)['data']['id']
 
-
     @staticmethod
     def extractTokenData(token):
         try:
@@ -110,17 +109,23 @@ class Token(object):
 
         return token_data
 
-
     @staticmethod
-    def getAuthEvents(token):
+    def getAuthEvents(token, include_past=False):
         user_id = Token.getUserId(token)
         session = DBSession()
-        events = tuple_to_list(
-            session.query(Event.id)
-                .filter(
-                Event.owner_id == user_id
-            ).all()
+
+        auth_events = session.query(Event.id).filter(
+            or_(
+                Event.owner_id == user_id,
+                Event.is_published
+            )
         )
+
+        # The filtration below has been removed because it's handled in the controllers.
+        # if include_past:
+        #     auth_events = auth_events.filter(Event.is_past)
+
+        events = tuple_to_list(auth_events.all())
         return events
 
 

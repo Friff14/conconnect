@@ -18,10 +18,9 @@ class Base(BaseModel):
         obj = self.__dict__.copy()
         obj.pop("_sa_instance_state")
 
-        print(obj)
         for key, value in obj.items():
             if type(value) == datetime.datetime:
-                obj[key] = arrow.get(value).humanize()
+                obj[key] = arrow.get(value).format()
 
         this_table = self.__class__
 
