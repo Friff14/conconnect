@@ -1,4 +1,3 @@
-import datetime
 import json
 import uuid
 
@@ -7,7 +6,7 @@ import jwt
 from passlib.hash import sha256_crypt
 from sqlalchemy.sql.elements import or_
 
-from data.tables import *
+from cc_data.tables import *
 
 pwd_context = sha256_crypt
 DBSession = sessionmaker(bind=engine)

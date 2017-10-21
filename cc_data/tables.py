@@ -1,7 +1,6 @@
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.sql.functions import func
 
-from data.models.Base import *
+from cc_data.models.Base import *
 
 activity_tag = Table('ActivityTag', Base.metadata,
                      Column("activity_id", Integer, ForeignKey("Activity.id")),
@@ -38,7 +37,8 @@ class Host(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     profile_photo = Column(String)
-    home = Column(String)
+    job_title = Column(String)
+    company = Column(String)
 
     activities = relationship("Activity", back_populates="host")
 
@@ -77,7 +77,7 @@ class User(Base):
 
     events = relationship("Event", back_populates="owner")
 
-    # locations = relationship("Location", back_populates="owner")
+    locations = relationship("Location", back_populates="owner")
 
 
 class Location(Base):

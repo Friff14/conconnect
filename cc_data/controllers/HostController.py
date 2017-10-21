@@ -1,12 +1,9 @@
-import json
-import falcon
-from data.controllers.TokenController import Token
-from data.tables import *
+from cc_data.tables import *
 
 DBSession = sessionmaker(bind=engine)
 
 
-class ActivityTagController(object):
+class HostController(object):
     def on_get(self, req, resp):
         pass
 

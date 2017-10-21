@@ -1,23 +1,20 @@
 from wsgiref import simple_server
-import os, sys
+
 import falcon
 
-from data.tables import *
-from api.middleware.JSONDecoding import JSONDecoding
 from api.middleware.Authentication import Authentication
-
+from api.middleware.JSONDecoding import JSONDecoding
+from cc_data.controllers.ActivityController import ActivityController
+from cc_data.controllers.ActivityTagController import ActivityTagController
+from cc_data.controllers.EventController import EventController
+from cc_data.controllers.FloorController import FloorController
+from cc_data.controllers.HostController import HostController
+from cc_data.controllers.LocationController import LocationController
+from cc_data.controllers.RoomController import RoomController
+from cc_data.controllers.TagController import TagController
 # Import all controllers
-from data.controllers.TokenController import Token
-
-from data.controllers.ActivityController import ActivityController
-from data.controllers.ActivityTagController import ActivityTagController
-from data.controllers.EventController import EventController
-from data.controllers.FloorController import FloorController
-from data.controllers.HostController import HostController
-from data.controllers.LocationController import LocationController
-from data.controllers.RoomController import RoomController
-from data.controllers.TagController import TagController
-from data.controllers.UserController import UserController
+from cc_data.controllers.TokenController import Token
+from cc_data.controllers.UserController import UserController
 
 app = application = falcon.API(
     'application/json',

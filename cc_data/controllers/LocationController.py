@@ -1,7 +1,7 @@
 import json
 
-from data.controllers.TokenController import Token
-from data.tables import *
+from cc_data.controllers.TokenController import Token
+from cc_data.tables import *
 
 DBSession = sessionmaker(bind=engine)
 
@@ -25,6 +25,7 @@ class LocationController(object):
             ret.append(l)
 
         resp.body = json.dumps(ret)
+        db_session.close()
 
     def on_post(self, req, resp):
         token = req.context['token']

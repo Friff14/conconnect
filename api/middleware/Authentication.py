@@ -1,8 +1,3 @@
-import json
-from data.controllers.TokenController import Token
-import falcon
-
-
 class Authentication:
     def process_request(self, req, resp):
         if 'AUTHORIZATION' in req.headers:

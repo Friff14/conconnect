@@ -1,7 +1,7 @@
 import json
-import falcon
-from data.controllers.TokenController import Token
-from data.tables import *
+
+from cc_data.controllers.TokenController import Token
+from cc_data.tables import *
 
 DBSession = sessionmaker(bind=engine)
 

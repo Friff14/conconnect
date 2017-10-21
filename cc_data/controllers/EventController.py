@@ -1,7 +1,9 @@
 import json
 
-from data.controllers.TokenController import Token
-from data.tables import *
+import falcon
+
+from cc_data.controllers.TokenController import Token
+from cc_data.tables import *
 
 # import arrow
 
@@ -46,7 +48,7 @@ class EventController(object):
             ret.append(e)
 
         resp.body = json.dumps(ret)
-
+        db_session.close()
 
     def on_post(self, req, resp):
         # start_date = arrow.get(req.get_param('start')).datetime if req.get_param else None
@@ -54,14 +56,21 @@ class EventController(object):
         token = req.context['token']
         user_id = Token.getUserId(token)
 
+        location_id = req.get_param_as_int('location')
+        location = Location.query.get(location_id)
+        if location.owner_id != user_id:
+            raise falcon.HTTPBadRequest(
+                "Not Authorized",
+                "This user is not authorized to access that location."
+            )
+
         new_event = Event(
             title=req.get_param('title'),
             start=req.get_param_as_datetime('start', '%Y-%m-%dT%H:%M:%S.%fZ'),
             end=req.get_param_as_datetime('end', '%Y-%m-%dT%H:%M:%S.%fZ'),
-            location=req.get_param('location'),
+            location_id=req.get_param('location'),
             owner_id=user_id
         )
-        # new_event.find_gps()
 
         returned_event = add_to_db(new_event)
         resp.body = json.dumps(returned_event)
