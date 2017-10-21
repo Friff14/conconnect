@@ -1,9 +1,9 @@
 import json
-# import arrow
-import falcon
 
 from data.controllers.TokenController import Token
 from data.tables import *
+
+# import arrow
 
 DBSession = sessionmaker(bind=engine)
 
@@ -13,8 +13,9 @@ class EventController(object):
         token = req.context['token']
         user_id = Token.getUserId(token)
         db_session = DBSession()
+        auth_events = Token.getAuthEvents(token)
         # Get the base for the events list
-        events = db_session.query(Event)
+        events = db_session.query(Event).filter(Event.id.in_(auth_events))
 
         # Get the filters from the querystring
         past = req.get_param_as_bool('past')
@@ -22,7 +23,6 @@ class EventController(object):
         gps = req.get_param('gps')
 
         if not past:
-            print(events[0].is_past)
             events = events.filter(
                 Event.is_past == false
             )
@@ -58,16 +58,10 @@ class EventController(object):
             title=req.get_param('title'),
             start=req.get_param_as_datetime('start', '%Y-%m-%dT%H:%M:%S.%fZ'),
             end=req.get_param_as_datetime('end', '%Y-%m-%dT%H:%M:%S.%fZ'),
-            # address_1=req.get_param('address_1'),
-            # address_2=req.get_param('address_2'),
-            # city=req.get_param('city'),
-            # state=req.get_param('state'),
-            # postcode=req.get_param('postcode'),
-            # country=req.get_param('country'),
             location=req.get_param('location'),
             owner_id=user_id
         )
-        new_event.find_gps()
+        # new_event.find_gps()
 
         returned_event = add_to_db(new_event)
         resp.body = json.dumps(returned_event)

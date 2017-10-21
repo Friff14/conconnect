@@ -1,12 +1,13 @@
+import datetime
 import json
 import uuid
+
 import falcon
 import jwt
 from passlib.hash import sha256_crypt
-from sqlalchemy.orm import join, outerjoin
-from sqlalchemy.sql.elements import and_, or_
+from sqlalchemy.sql.elements import or_
+
 from data.tables import *
-import datetime
 
 pwd_context = sha256_crypt
 DBSession = sessionmaker(bind=engine)
@@ -127,6 +128,21 @@ class Token(object):
 
         events = tuple_to_list(auth_events.all())
         return events
+
+    @staticmethod
+    def getAuthLocations(token):
+        user_id = Token.getUserId(token)
+        session = DBSession()
+
+        auth_locations = session.query(Location.id).filter(
+            or_(
+                Location.owner_id == user_id,
+                Location.events.any(Event.is_published)
+            )
+        )
+
+        locations = tuple_to_list(auth_locations.all())
+        return locations
 
 
 def tuple_to_list(t):

@@ -1,6 +1,7 @@
-from data.models.Base import *
-from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.sql.functions import func
+
+from data.models.Base import *
 
 activity_tag = Table('ActivityTag', Base.metadata,
                      Column("activity_id", Integer, ForeignKey("Activity.id")),
@@ -37,7 +38,7 @@ class Host(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     profile_photo = Column(String)
-    location = Column(String)
+    home = Column(String)
 
     activities = relationship("Activity", back_populates="host")
 
@@ -68,7 +69,6 @@ class Event(Base):
         return self.end < func.current_date()
 
 
-
 class User(Base):
     __tablename__ = 'User'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -76,6 +76,8 @@ class User(Base):
     pword = Column(String, nullable=False)
 
     events = relationship("Event", back_populates="owner")
+
+    # locations = relationship("Location", back_populates="owner")
 
 
 class Location(Base):
@@ -86,12 +88,18 @@ class Location(Base):
 
     address_1 = Column(String)
     address_2 = Column(String)
+
     city = Column(String)
     state = Column(String)
     postcode = Column(String)
     country = Column(String)
 
+    events = relationship("Event", back_populates="location")
+
     floors = relationship("Floor", back_populates="location")
+
+    owner_id = Column(Integer, ForeignKey("User.id"))
+    owner = relationship("User")
 
     def find_gps(self):
         # Send the address to a library that then sets the GPS from it.
