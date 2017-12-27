@@ -7,7 +7,7 @@ DBSession = sessionmaker(bind=engine)
 
 
 class FloorController(object):
-    def on_get(self, req, resp):
+    def on_get(self, req, resp, location_id=None, floor_id=None):
         token = req.context['token']
         user_id = Token.getUserId(token)
         db_session = DBSession()
@@ -15,6 +15,16 @@ class FloorController(object):
         floors = db_session.query(Floor).filter(
             Floor.location_id.in_(auth_locations)
         )
+
+        if not location_id:
+            location_id = req.get_param('location_id')
+        if location_id:
+            floors = floors.filter(Floor.location_id == location_id)
+        if not floor_id:
+            floor_id = req.get_param('floor_id')
+        if floor_id:
+            print("Floor ID!", floor_id)
+            floors = floors.filter(Floor.id == floor_id)
 
         ret = []
         for floor in floors.all():

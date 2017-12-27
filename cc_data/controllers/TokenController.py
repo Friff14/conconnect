@@ -80,7 +80,10 @@ class Token(object):
 
     @staticmethod
     def getUserId(token):
-        return Token.extractTokenData(token)['data']['id']
+        if token:
+            return Token.extractTokenData(token)['data']['id']
+        else:
+            return None
 
     @staticmethod
     def extractTokenData(token):

@@ -19,12 +19,13 @@ class EventController(object):
         # Get the base for the events list
         events = db_session.query(Event).filter(Event.id.in_(auth_events))
 
+
         # Get the filters from the querystring
         past = req.get_param_as_bool('past')
         mine = req.get_param_as_bool('mine')
         gps = req.get_param('gps')
 
-        if not past:
+        if past and past is not None:
             events = events.filter(
                 Event.is_past == false
             )
@@ -35,6 +36,8 @@ class EventController(object):
         if gps:
             # TODO: Implement near-me GPS info
             pass
+
+        print(events.all())
 
         if event_id:
             events = events.filter(
@@ -47,6 +50,7 @@ class EventController(object):
             e['mine'] = e['owner_id'] == user_id
             ret.append(e)
 
+
         resp.body = json.dumps(ret)
         db_session.close()
 
@@ -56,8 +60,9 @@ class EventController(object):
         token = req.context['token']
         user_id = Token.getUserId(token)
 
-        location_id = req.get_param_as_int('location')
-        location = Location.query.get(location_id)
+        location_id = req.get_param_as_int('location_id')
+
+        location = get_location_by_id(location_id)
         if location.owner_id != user_id:
             raise falcon.HTTPBadRequest(
                 "Not Authorized",

@@ -34,6 +34,8 @@ class Base(BaseModel):
                     foreign_ids.append(foreign_obj.id)
                 obj[r_name] = foreign_ids
 
+        obj['type'] = this_table.__name__.lower()
+
         return obj
 
 

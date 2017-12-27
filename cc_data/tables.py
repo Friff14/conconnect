@@ -14,8 +14,8 @@ class Activity(Base):
     title = Column(String)
     subtitle = Column(String)
     description = Column(String)
-    start = Column(DateTime)
-    end = Column(DateTime)
+    start = Column(String)
+    end = Column(String)
     cover_image = Column(String)
 
     host_id = Column(Integer, ForeignKey("Host.id"))
@@ -28,8 +28,8 @@ class Activity(Base):
     event = relationship("Event")
 
     tags = relationship("Tag",
-                        secondary=activity_tag,
-                        back_populates="activities")
+                        secondary=activity_tag)#,
+                        # back_populates="activities")
 
 
 class Host(Base):
@@ -39,6 +39,9 @@ class Host(Base):
     profile_photo = Column(String)
     job_title = Column(String)
     company = Column(String)
+
+    event_id = Column(Integer, ForeignKey("Event.id"))
+    event = relationship("Event")
 
     activities = relationship("Activity", back_populates="host")
 
@@ -133,10 +136,19 @@ class Room(Base):
 class Tag(Base):
     __tablename__ = 'Tag'
     id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String)
 
-    activities = relationship("Activity",
-                              secondary=activity_tag,
-                              back_populates="tags")
+    tag_category_id = Column(Integer, ForeignKey('TagCategory.id'))
+    tag_category = relationship("TagCategory")
+    # activities = relationship("Activity",
+    #                           secondary=activity_tag,
+    #                           back_populates="tags")
+
+
+class TagCategory(Base):
+    __tablename__ = 'TagCategory'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String)
 
 
 session = sessionmaker()
@@ -144,6 +156,13 @@ session.configure(bind=engine)
 Base.metadata.bind = engine
 Base.metadata.create_all(engine)
 
+
+def get_location_by_id(id):
+    db_session = session()
+    print("Get location ", id)
+    l = db_session.query(Location).get(id)
+    db_session.close()
+    return l
 
 def add_to_db(item):
     db_session = session()
@@ -156,11 +175,15 @@ def add_to_db(item):
     return json_data
 
 
+def edit_db_object(class_name, primary_key, params):
+    pass
+
 if __name__ == '__main__':
-    db_session = session()
-    db_session.add(User(
-        email="friff14@gmail.com",
-        pword="$5$rounds=535000$BJwX2AvGJUsqAIl2$D1AUrNjwvYBIJxoYQZ8qZuQcN4nhVPEEprtF2OU7oQ."
-    ))
-    db_session.commit()
-    db_session.close()
+    pass
+    # db_session = session()
+    # db_session.add(User(
+    #     email="friff14@gmail.com",
+    #     pword="$5$rounds=535000$BJwX2AvGJUsqAIl2$D1AUrNjwvYBIJxoYQZ8qZuQcN4nhVPEEprtF2OU7oQ."
+    # ))
+    # db_session.commit()
+    # db_session.close()
