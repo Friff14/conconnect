@@ -1,6 +1,6 @@
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from cc_data.models.Base import *
+from conconnect.cc_data.models.Base import *
 
 activity_tag = Table('ActivityTag', Base.metadata,
                      Column("activity_id", Integer, ForeignKey("Activity.id")),
@@ -11,12 +11,12 @@ activity_tag = Table('ActivityTag', Base.metadata,
 class Activity(Base):
     __tablename__ = 'Activity'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    title = Column(String)
-    subtitle = Column(String)
-    description = Column(String)
-    start = Column(String)
-    end = Column(String)
-    cover_image = Column(String)
+    title = Column(String(255))
+    subtitle = Column(String(255))
+    description = Column(String(511))
+    start = Column(String(128))
+    end = Column(String(128))
+    cover_image = Column(String(1023))
 
     host_id = Column(Integer, ForeignKey("Host.id"))
     host = relationship("Host")
@@ -35,10 +35,10 @@ class Activity(Base):
 class Host(Base):
     __tablename__ = 'Host'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String)
-    profile_photo = Column(String)
-    job_title = Column(String)
-    company = Column(String)
+    name = Column(String(255))
+    profile_photo = Column(String(255))
+    job_title = Column(String(255))
+    company = Column(String(255))
 
     event_id = Column(Integer, ForeignKey("Event.id"))
     event = relationship("Event")
@@ -49,11 +49,11 @@ class Host(Base):
 class Event(Base):
     __tablename__ = 'Event'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    title = Column(String)
+    title = Column(String(255))
     start = Column(DateTime)
     end = Column(DateTime)
 
-    gps = Column(String)
+    gps = Column(String(255))
 
     location_id = Column(Integer, ForeignKey("Location.id"))
     location = relationship("Location")
@@ -75,8 +75,8 @@ class Event(Base):
 class User(Base):
     __tablename__ = 'User'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    email = Column(String, nullable=False, unique=True)
-    pword = Column(String, nullable=False)
+    email = Column(String(255), nullable=False, unique=True)
+    pword = Column(String(255), nullable=False)
 
     events = relationship("Event", back_populates="owner")
 
@@ -86,16 +86,16 @@ class User(Base):
 class Location(Base):
     __tablename__ = 'Location'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
-    gps = Column(String)
+    name = Column(String(255), nullable=False)
+    gps = Column(String(255))
 
-    address_1 = Column(String)
-    address_2 = Column(String)
+    address_1 = Column(String(255))
+    address_2 = Column(String(255))
 
-    city = Column(String)
-    state = Column(String)
-    postcode = Column(String)
-    country = Column(String)
+    city = Column(String(255))
+    state = Column(String(255))
+    postcode = Column(String(255))
+    country = Column(String(255))
 
     events = relationship("Event", back_populates="location")
 
@@ -112,8 +112,8 @@ class Location(Base):
 class Floor(Base):
     __tablename__ = 'Floor'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
-    map_src = Column(String)
+    name = Column(String(255), nullable=False)
+    map_src = Column(String(255))
 
     location_id = Column(Integer, ForeignKey("Location.id"))
     location = relationship("Location")
@@ -122,7 +122,7 @@ class Floor(Base):
 class Room(Base):
     __tablename__ = 'Room'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
+    name = Column(String(255), nullable=False)
     pin_x = Column(Integer)
     pin_y = Column(Integer)
 
@@ -136,7 +136,7 @@ class Room(Base):
 class Tag(Base):
     __tablename__ = 'Tag'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String)
+    name = Column(String(255))
 
     tag_category_id = Column(Integer, ForeignKey('TagCategory.id'))
     tag_category = relationship("TagCategory")
@@ -148,7 +148,7 @@ class Tag(Base):
 class TagCategory(Base):
     __tablename__ = 'TagCategory'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String)
+    name = Column(String(255))
 
 
 session = sessionmaker()

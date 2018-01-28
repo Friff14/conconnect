@@ -1,17 +1,17 @@
 import json
 
-from cc_data.controllers.TokenController import Token
-from cc_data.tables import *
+import falcon
 
-DBSession = sessionmaker(bind=engine)
+from conconnect.cc_data.controllers.TokenController import Token
+from conconnect.cc_data.tables import *
 
 
 class FloorController(object):
     def on_get(self, req, resp, location_id=None, floor_id=None):
         token = req.context['token']
         user_id = Token.getUserId(token)
-        db_session = DBSession()
-        auth_locations = Token.getAuthLocations(token)
+        db_session = req.context['session']
+        auth_locations = Token.getAuthLocations(token, session=db_session)
         floors = db_session.query(Floor).filter(
             Floor.location_id.in_(auth_locations)
         )
@@ -34,7 +34,26 @@ class FloorController(object):
         db_session.close()
 
     def on_post(self, req, resp):
-        pass
+        location_id = req.get_param_as_int('location_id')
+        token = req.context['token']
+        session = req.context['session']
+        auth_locations = Token.getAuthLocations(token, session=session)
+        if not location_id in auth_locations:
+            raise falcon.HTTPUnauthorized(
+                "Unauthorized",
+                "You are not allowed to add floors to this location."
+            )
+
+        floor = Floor()
+        session.add(floor)
+
+        floor.update(req.params)
+        session.commit()
+        session.flush()
+        session.refresh(floor)
+
+        resp.body = json.dumps(floor.json())
+
 
     def on_put(self, req, resp):
         pass

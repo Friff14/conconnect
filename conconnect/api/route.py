@@ -2,28 +2,30 @@ from wsgiref import simple_server
 
 import falcon
 
-from api.middleware.Authentication import Authentication
-from api.middleware.CrossOrigin import CrossOrigin
-from api.middleware.JSONDecoding import JSONDecoding
-from cc_data.controllers.ActivityController import ActivityController
-from cc_data.controllers.ActivityTagController import ActivityTagController
-from cc_data.controllers.EventController import EventController
-from cc_data.controllers.FloorController import FloorController
-from cc_data.controllers.HostController import HostController
-from cc_data.controllers.LocationController import LocationController
-from cc_data.controllers.RoomController import RoomController
-from cc_data.controllers.TagCategoryController import TagCategoryController
-from cc_data.controllers.TagController import TagController
+from conconnect.api.middleware.Authentication import Authentication
+from conconnect.api.middleware.CrossOrigin import CrossOrigin
+from conconnect.api.middleware.JSONDecoding import JSONDecoding
+from conconnect.api.middleware.Session import Session
+from conconnect.cc_data.controllers.ActivityController import ActivityController
+from conconnect.cc_data.controllers.ActivityTagController import ActivityTagController
+from conconnect.cc_data.controllers.EventController import EventController
+from conconnect.cc_data.controllers.FloorController import FloorController
+from conconnect.cc_data.controllers.HostController import HostController
+from conconnect.cc_data.controllers.LocationController import LocationController
+from conconnect.cc_data.controllers.RoomController import RoomController
+from conconnect.cc_data.controllers.TagCategoryController import TagCategoryController
+from conconnect.cc_data.controllers.TagController import TagController
 # Import all controllers
-from cc_data.controllers.TokenController import Token
-from cc_data.controllers.UserController import UserController
+from conconnect.cc_data.controllers.TokenController import Token
+from conconnect.cc_data.controllers.UserController import UserController
 
 app = application = falcon.API(
     'application/json',
     middleware=[
         Authentication(),
         JSONDecoding(),
-        CrossOrigin()
+        CrossOrigin(),
+        Session()
     ]
 )
 
@@ -110,3 +112,4 @@ if __name__ == '__main__':
     httpd = simple_server.make_server('localhost', 4000, app)
     print("Serving:", httpd)
     httpd.serve_forever()
+

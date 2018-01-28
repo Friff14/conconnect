@@ -3,10 +3,8 @@ import json
 import falcon
 from passlib.hash import sha256_crypt
 
-from cc_data.controllers.TokenController import Token
-from cc_data.tables import *
-
-DBSession = sessionmaker(bind=engine)
+from conconnect.cc_data.controllers.TokenController import Token
+from conconnect.cc_data.tables import *
 
 
 class UserController():
@@ -20,7 +18,7 @@ class UserController():
         user_id = Token.getUserId(token)
         print("User ID:", user_id)
 
-        db_session = DBSession()
+        db_session = req.context['session']
         user = db_session.query(User).filter(User.id == user_id).first()
         resp.body = json.dumps(user.json())
 

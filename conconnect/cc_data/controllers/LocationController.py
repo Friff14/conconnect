@@ -1,17 +1,15 @@
 import json
 
-from cc_data.controllers.TokenController import Token
-from cc_data.tables import *
-
-DBSession = sessionmaker(bind=engine)
+from conconnect.cc_data.controllers.TokenController import Token
+from conconnect.cc_data.tables import *
 
 
 class LocationController(object):
     def on_get(self, req, resp, location_id=None):
         token = req.context['token']
         user_id = Token.getUserId(token)
-        db_session = DBSession()
-        auth_locations = Token.getAuthLocations(token)
+        db_session = req.context['session']
+        auth_locations = Token.getAuthLocations(token, session=db_session)
 
         locations = db_session.query(Location).filter(Location.id.in_(auth_locations))
         if location_id:

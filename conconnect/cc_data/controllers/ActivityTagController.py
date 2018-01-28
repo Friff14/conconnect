@@ -1,8 +1,3 @@
-from cc_data.tables import *
-
-DBSession = sessionmaker(bind=engine)
-
-
 class ActivityTagController(object):
     def on_get(self, req, resp):
         pass

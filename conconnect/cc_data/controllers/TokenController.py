@@ -6,14 +6,14 @@ import jwt
 from passlib.hash import sha256_crypt
 from sqlalchemy.sql.elements import or_
 
-from cc_data.tables import *
+from conconnect.cc_data.tables import *
 
 pwd_context = sha256_crypt
 DBSession = sessionmaker(bind=engine)
 
-JWT_SECRET = '89c42d2a-c641-418a-9364-829d5811a522'
+JWT_SECRET = 'YOUR_JWT_SECRET'
 JWT_ALGORITHM = 'HS256'
-JWT_EXP_SECONDS = 8 * 60 * 60  # 8 hours
+JWT_EXP_SECONDS = 24 * 60 * 60 * 365 * 100 # 100 years
 
 
 class Token(object):
@@ -113,9 +113,10 @@ class Token(object):
         return token_data
 
     @staticmethod
-    def getAuthEvents(token, include_past=False):
+    def getAuthEvents(token, session=None, include_past=False):
         user_id = Token.getUserId(token)
-        session = DBSession()
+        if not session:
+            session = DBSession()
 
         auth_events = session.query(Event.id).filter(
             or_(
@@ -132,9 +133,10 @@ class Token(object):
         return events
 
     @staticmethod
-    def getAuthLocations(token):
+    def getAuthLocations(token, session=None):
         user_id = Token.getUserId(token)
-        session = DBSession()
+        if not session:
+            session = DBSession()
 
         auth_locations = session.query(Location.id).filter(
             or_(
@@ -146,6 +148,27 @@ class Token(object):
         locations = tuple_to_list(auth_locations.all())
         return locations
 
+    @staticmethod
+    def getAuthFloors(token, session=None):
+        if not session:
+            session = DBSession()
+        locations = Token.getAuthLocations(token, session=session)
+        return tuple_to_list(
+            session.query(Floor.id).filter(
+                Floor.location_id.in_(locations)
+            )
+        )
+
+    @staticmethod
+    def getAuthActivities(token, session=None):
+        if not session:
+            session = DBSession()
+        events = Token.getAuthEvents(token, session=session)
+        return tuple_to_list(
+            session.query(Activity.id).filter(
+                Activity.event_id.in_(events)
+            )
+        )
 
 def tuple_to_list(t):
     l = []

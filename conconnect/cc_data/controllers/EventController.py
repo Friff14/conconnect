@@ -2,23 +2,22 @@ import json
 
 import falcon
 
-from cc_data.controllers.TokenController import Token
-from cc_data.tables import *
+from conconnect.cc_data.controllers.TokenController import Token
+from conconnect.cc_data.tables import *
+
 
 # import arrow
-
-DBSession = sessionmaker(bind=engine)
 
 
 class EventController(object):
     def on_get(self, req, resp, event_id=None):
         token = req.context['token']
         user_id = Token.getUserId(token)
-        db_session = DBSession()
-        auth_events = Token.getAuthEvents(token)
+        db_session = req.context['session']
+        auth_events = Token.getAuthEvents(token, session=db_session)
+
         # Get the base for the events list
         events = db_session.query(Event).filter(Event.id.in_(auth_events))
-
 
         # Get the filters from the querystring
         past = req.get_param_as_bool('past')
@@ -49,7 +48,6 @@ class EventController(object):
             e = event.json()
             e['mine'] = e['owner_id'] == user_id
             ret.append(e)
-
 
         resp.body = json.dumps(ret)
         db_session.close()
